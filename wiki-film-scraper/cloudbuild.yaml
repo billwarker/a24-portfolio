@@ -1,0 +1,15 @@
+steps:
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  args:
+  - gcloud
+  - functions
+  - deploy
+  - wiki-film-scraper
+  - --region=us-east1
+  - --source=projects/a24-portfolio/wiki-film-scraper
+  - --trigger-http
+  - --runtime=python310
+  - --entry-point=wiki_film_scraper
+
+options:
+  logging: CLOUD_LOGGING_ONLY

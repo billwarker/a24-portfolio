@@ -3,6 +3,8 @@ import pandas as pd
 import requests as re
 from bs4 import BeautifulSoup
 
+from google.cloud import bigquery
+
 def scrape_page_section_table(t):
     
     page_section = t.find_previous('h2').text.removesuffix('[edit]')
@@ -22,6 +24,40 @@ def scrape_page_section_table(t):
             data[row_ix][t_header_cols[col_ix]] = col.text.strip()
 
     return (page_section, data)
+
+def define_wiki_df_schema(wiki_df):
+    schema = []
+
+    for col, dtype in zip(wiki_df.columns, wiki_df.dtypes):
+
+        if col == 'release_date':
+            bq_dtype = bigquery.enums.SqlTypeNames.DATE
+        else:
+            bq_dtype = bigquery.enums.SqlTypeNames.STRING
+        
+        bq_col = bigquery.SchemaField(col, bq_dtype)
+        
+        schema.append(bq_col)
+
+    return schema
+
+def write_df_to_bq(df, schema, dataset_id, table_name):
+    client = bigquery.client()
+
+    table_id = f"{dataset_id}.{table_name}"
+
+    job_config = bigquery.LoadJobConfig(
+        schema=schema,
+        write_disposition="WRITE_TRUNCATE"
+        )
+
+    job = client.load_table_from_dataframe(
+        df,
+        table_id,
+        job_config=job_config
+        )  # Make an API request.
+
+    return job.result()
         
 @functions_framework.http
 def wiki_film_scraper(request):
@@ -52,6 +88,11 @@ def wiki_film_scraper(request):
         table_data.append(payload)
     
     valid_sections = ['2010s', '2020s', 'Dated films']
-    final_df = pd.concat([pd.DataFrame.from_dict(t[1], orient='index') for t in table_data if t[0] in valid_sections], ignore_index=True)
+    wiki_df = pd.concat([pd.DataFrame.from_dict(t[1], orient='index') for t in table_data if t[0] in valid_sections], ignore_index=True)
 
-    return final_df.to_string()
+    wiki_df = wiki_df.drop(labels=["ref"], axis=1)
+    wiki_df.release_date = pd.to_datetime(wiki_df.release_date)
+
+    wiki_df_schema = define_wiki_df_schema(wiki_df)
+
+    return write_df_to_bq(wiki_df, wiki_df_schema, "wikipedia", "list_of_A24_films")

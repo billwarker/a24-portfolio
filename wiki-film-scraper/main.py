@@ -11,6 +11,14 @@ def scrape_page_section_table(t):
     page_section = t.find_previous('h2').text.removesuffix('[edit]')
     t_header = t.find_all('tr')[0]
     t_header_cols = [th.text.strip().removesuffix('[a]') for th in t_header.find_all('th')]
+
+    t_header_cols_fmt = []
+    
+    for col in t_header_cols:
+        col = col.lower()
+        col = col.replace(r' ', '_')
+        col = re.sub("\(.*\)|\[.*\]|\.", "", col)
+        t_header_cols_fmt.append(col)
     
     data = {}
     

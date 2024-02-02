@@ -58,11 +58,8 @@ def write_df_to_bq(df, schema, dataset_id, table_name):
         )  # Make an API request.
 
     return job.result()
-        
-@functions_framework.cloud_event
-def wiki_film_scraper(cloud_event):
 
-    print(cloud_event.message)
+def wiki_film_scraper():
 
     wiki_films_url = 'https://en.wikipedia.org/wiki/List_of_A24_films'
 
@@ -89,3 +86,9 @@ def wiki_film_scraper(cloud_event):
     wiki_df_schema = define_wiki_df_schema(wiki_df)
 
     return write_df_to_bq(wiki_df, wiki_df_schema, "wikipedia", "list_of_A24_films")
+
+def subscribe(cloud_event: CloudEvent) -> str:
+
+    print(cloud_event.message)
+
+    return wiki_film_scraper()

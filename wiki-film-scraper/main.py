@@ -88,7 +88,7 @@ def wiki_film_scraper():
 
     return write_df_to_bq(wiki_df, wiki_df_schema, "wikipedia", "list_of_A24_films")
 
-def subscribe(cloud_event: CloudEvent) -> str:
+def subscribe(self, cloud_event: CloudEvent) -> str:
 
     print(cloud_event.message)
     status = wiki_film_scraper()

@@ -3,6 +3,7 @@ import pandas as pd
 import requests as re
 from bs4 import BeautifulSoup
 
+from cloudevents.http import CloudEvent
 from google.cloud import bigquery
 
 def scrape_page_section_table(t):

@@ -59,17 +59,10 @@ def write_df_to_bq(df, schema, dataset_id, table_name):
 
     return job.result()
         
-@functions_framework.http
-def wiki_film_scraper(request):
-    """HTTP Cloud Function.
-    Args:
-        request (flask.Request): The request object.
-        <https://flask.palletsprojects.com/en/1.1.x/api/#incoming-request-data>
-    Returns:
-        The response text, or any set of values that can be turned into a
-        Response object using `make_response`
-        <https://flask.palletsprojects.com/en/1.1.x/api/#flask.make_response>.
-    """
+@functions_framework.cloud_event
+def wiki_film_scraper(cloud_event):
+
+    print(cloud_event.message)
 
     wiki_films_url = 'https://en.wikipedia.org/wiki/List_of_A24_films'
 
@@ -90,7 +83,7 @@ def wiki_film_scraper(request):
     valid_sections = ['2010s', '2020s', 'Dated films']
     wiki_df = pd.concat([pd.DataFrame.from_dict(t[1], orient='index') for t in table_data if t[0] in valid_sections], ignore_index=True)
 
-    wiki_df = wiki_df.drop(labels=["ref"], axis=1)
+    # wiki_df = wiki_df.drop(labels=["ref"], axis=1)
     wiki_df.release_date = pd.to_datetime(wiki_df.release_date)
 
     wiki_df_schema = define_wiki_df_schema(wiki_df)

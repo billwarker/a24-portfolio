@@ -7,9 +7,9 @@ steps:
   - wiki-film-scraper
   - --region=us-east1
   - --source=wiki-film-scraper
-  - --trigger-http
+  - --trigger-topic=weekly-monday-jobs
   - --runtime=python310
-  - --entry-point=wiki_film_scraper
+  - --entry-point=subscribe
 
 options:
   logging: CLOUD_LOGGING_ONLY

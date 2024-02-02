@@ -91,5 +91,6 @@ def wiki_film_scraper():
 def subscribe(cloud_event: CloudEvent) -> str:
 
     print(cloud_event.message)
+    status = wiki_film_scraper()
 
-    return wiki_film_scraper()
+    return status

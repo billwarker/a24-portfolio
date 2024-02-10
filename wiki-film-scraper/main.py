@@ -106,6 +106,3 @@ def subscribe(self, cloud_event: CloudEvent) -> str:
     status = wiki_film_scraper()
 
     return status
-
-if __name__ == '__main__':
-    print(bigquery)

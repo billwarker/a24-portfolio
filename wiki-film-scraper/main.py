@@ -89,7 +89,7 @@ def wiki_film_scraper():
         payload = scrape_page_section_table(t)            
         table_data.append(payload)
     
-    valid_sections = ['2010s', '2020s', 'Dated films']
+    valid_sections = ['2010s', '2020s']
     wiki_df = pd.concat([pd.DataFrame.from_dict(t[1], orient='index') for t in table_data if t[0] in valid_sections], ignore_index=True)
     
     print(wiki_df.info())

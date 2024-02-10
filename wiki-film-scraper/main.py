@@ -33,7 +33,7 @@ def scrape_page_section_table(t):
                         
         for col_ix, col in enumerate(row.find_all('td')):
 
-            data[row_ix][t_header_cols[col_ix]] = col.text.strip()
+            data[row_ix][t_header_cols_fmt[col_ix]] = col.text.strip()
 
     return (page_section, data)
 

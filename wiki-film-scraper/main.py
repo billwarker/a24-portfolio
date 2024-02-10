@@ -54,7 +54,7 @@ def define_wiki_df_schema(wiki_df):
     return schema
 
 def write_df_to_bq(df, schema, dataset_id, table_name):
-    client = bigquery.client()
+    client = bigquery.Client()
 
     table_id = f"{dataset_id}.{table_name}"
 
@@ -106,3 +106,6 @@ def subscribe(self, cloud_event: CloudEvent) -> str:
     status = wiki_film_scraper()
 
     return status
+
+if __name__ == '__main__':
+    print(bigquery)

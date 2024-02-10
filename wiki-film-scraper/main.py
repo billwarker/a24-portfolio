@@ -21,7 +21,7 @@ def scrape_page_section_table(t):
         col = re.sub("\(.*\)|\[.*\]|\.", "", col)
         t_header_cols_fmt.append(col)
     
-    print(t_header_cols_fmt)
+    print(f"{page_section}: {t_header_cols_fmt}")
 
     data = {}
     
@@ -91,6 +91,8 @@ def wiki_film_scraper():
     
     valid_sections = ['2010s', '2020s', 'Dated films']
     wiki_df = pd.concat([pd.DataFrame.from_dict(t[1], orient='index') for t in table_data if t[0] in valid_sections], ignore_index=True)
+    
+    print(wiki_df.info())
 
     # wiki_df = wiki_df.drop(labels=["ref"], axis=1)
     wiki_df.release_date = pd.to_datetime(wiki_df.release_date)

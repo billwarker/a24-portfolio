@@ -1,6 +1,7 @@
 import functions_framework
 import pandas as pd
-import requests as re
+import requests as rq
+import re
 from bs4 import BeautifulSoup
 
 from cloudevents.http import CloudEvent
@@ -72,7 +73,7 @@ def wiki_film_scraper():
 
     wiki_films_url = 'https://en.wikipedia.org/wiki/List_of_A24_films'
 
-    page = re.get(url=wiki_films_url)
+    page = rq.get(url=wiki_films_url)
     soup = BeautifulSoup(page.text, 'html.parser')
 
     for h in soup.find_all('h3'):

@@ -1,4 +1,4 @@
-import functions_framework
+# import functions_framework
 import pandas as pd
 import requests as rq
 import re
@@ -21,6 +21,8 @@ def scrape_page_section_table(t):
         col = re.sub("\(.*\)|\[.*\]|\.", "", col)
         t_header_cols_fmt.append(col)
     
+    print(t_header_cols_fmt)
+
     data = {}
     
     for row_ix, row in enumerate(t.find_all('tr')[1:]):

@@ -1,5 +1,5 @@
 # import functions_framework
-# import pandas as pd
+import pandas as pd
 import requests as rq
 import re
 from bs4 import BeautifulSoup

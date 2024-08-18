@@ -1,0 +1,27 @@
+[   
+    {
+      "name": "search_title",
+      "type": "STRING",
+      "mode": "REQUIRED"
+    },
+    {
+      "name": "search_release_year",
+      "type": "INT64",
+      "mode": "REQUIRED"
+    },
+    {
+      "name": "mojo_title",
+      "type": "STRING",
+      "mode": "NULLABLE"
+    },
+    {
+      "name": "mojo_release_year",
+      "type": "INT64",
+      "mode": "NULLABLE"
+    },
+    {
+      "name": "mojo_release_url",
+      "type": "STRING",
+      "mode": "NULLABLE"
+    }
+  ]

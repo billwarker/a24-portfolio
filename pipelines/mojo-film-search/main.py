@@ -18,9 +18,13 @@ def run_query_in_bq(client, query: str):
 
     return query_job.result()
 
-def write_df_to_bq(client, df, schema, dataset_id, table_name):
+def write_df_to_bq(client, df, schema_path, dataset_id, table_name):
+
+    client.create_dataset(dataset_id, exists_ok=True)
 
     table_id = f"{dataset_id}.{table_name}"
+    
+    schema = client.schema_from_json(schema_path)
 
     job_config = bigquery.LoadJobConfig(
         schema=schema,
@@ -35,12 +39,19 @@ def write_df_to_bq(client, df, schema, dataset_id, table_name):
 
     return job.result()
 
-def mojo_search_for_release_url(title: str, release_year: int, sleep_interval=5) -> str:
+def mojo_search_for_film_release(title: str,
+                                 release_year: int,
+                                 sleep_interval=3) -> str:
 
     print(f'Title: {title}, {release_year}')
 
     match_url = None
-    release_url = None
+
+    release_data = {
+        'mojo_title': None,
+        'mojo_release_year': None,
+        'mojo_release_url': None
+        }
 
     mojo_root_url = 'https://www.boxofficemojo.com'
     mojo_search_ext = '/search/?q='
@@ -63,6 +74,9 @@ def mojo_search_for_release_url(title: str, release_year: int, sleep_interval=5)
             
             match_url = result_name['href']
             print(f'Match Found: {mojo_root_url + match_url}')
+
+            release_data['mojo_title'] = result_name.text
+            release_data['mojo_release_year'] = result_year
             
             break
 
@@ -73,42 +87,47 @@ def mojo_search_for_release_url(title: str, release_year: int, sleep_interval=5)
         match_page = rq.get(url='https://www.boxofficemojo.com' + match_url)
         match_soup = BeautifulSoup(match_page.text, 'html.parser')
 
+        mojo_release_url = None
+
         for link in match_soup.find_all('a'):
             
             if '/release/' in link['href']:
                 
                 release_url_ext = re.search('(\/release\/rl[0-9]+)\/.*$', link['href']).group(1)
-                release_url = mojo_root_url + release_url_ext
-                print(f'Release Found: {release_url}')
-                     
+                mojo_release_url = mojo_root_url + release_url_ext
+                print(f'Release Found: {mojo_release_url}')
+                release_data['mojo_release_url'] = mojo_release_url
+
                 break
 
-        if not release_url:
+        if not mojo_release_url:
             print('No Release Found')
-        
+    
     else:
         print('No Match Found')
-    
-    return release_url
 
-def mojo_film_search():
-    query = """
-    SELECT title, EXTRACT(YEAR FROM release_date) AS release_year
-    FROM `a24-portfolio.wikipedia.list_of_A24_films`
-    WHERE
-        EXTRACT(YEAR FROM release_date) >= 2022
-    
-    ORDER BY release_date
-    LIMIT 5
-    """
+    return release_data
+
+def mojo_film_search(
+        query_path, 
+        schema_path,
+        dataset_id,
+        table_name,
+        sleep_interval):
+
+    print('Running mojo-film-search...\n')
 
     client = bigquery.Client()
+
+    query_file = open(query_path, mode='r')
+
+    query = query_file.read()
 
     print(f"""Running query in BQ:
           
           ---
           {query}
-          ---
+          ---\n
           """)
 
     query_results = run_query_in_bq(client, query)
@@ -121,21 +140,39 @@ def mojo_film_search():
         title = row.title
         release_year = int(row.release_year)
 
-        mojo_release_url = mojo_search_for_release_url(title, release_year)
+        release_data = mojo_search_for_film_release(title,
+                                                    release_year,
+                                                    sleep_interval=sleep_interval)
 
         data[ix] = {
-            'title': title,
-            'release_year': release_year,
-            'mojo_release_url': mojo_release_url
-            }
-        
+                'search_title': title,
+                'search_release_year': release_year,
+                'mojo_title': release_data['mojo_title'],
+                'mojo_release_year': release_data['mojo_release_year'],
+                'mojo_release_url': release_data['mojo_release_url']
+                }
+            
         print(f'\nData collected: {data[ix]}\n')
     
     df = pd.DataFrame.from_dict(data, orient='index')
 
-    return df
+    print('Writing dataframe to BQ:')
+
+    return write_df_to_bq(client,
+                          df,
+                          schema_path=schema_path,
+                          dataset_id='box_office_mojo',
+                          table_name='mojo_film_search'
+                          )
 
 if __name__ == '__main__':
 
-    df = mojo_film_search()
-    print(df)
+    status = mojo_film_search(
+        query_path='query__mojo_film_search.sql',
+        schema_path='schema__mojo_film_search.json',
+        dataset_id='box_office_mojo',
+        table_name='mojo_film_search',
+        sleep_interval=3
+        )
+    
+    print(status)

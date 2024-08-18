@@ -1,0 +1,15 @@
+steps:
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  args:
+  - gcloud
+  - functions
+  - deploy
+  - a24-film-scraper
+  - --region=us-east1
+  - --source=a24-film-scraper
+  - --trigger-topic=weekly-monday-jobs
+  - --runtime=python310
+  - --entry-point=subscribe
+
+options:
+  logging: CLOUD_LOGGING_ONLY

@@ -6,7 +6,7 @@ steps:
   - deploy
   - a24-film-scraper
   - --region=us-east1
-  - --source=a24-film-scraper
+  - --source=pipelines/a24-film-scraper
   - --trigger-topic=weekly-monday-jobs
   - --runtime=python310
   - --entry-point=subscribe

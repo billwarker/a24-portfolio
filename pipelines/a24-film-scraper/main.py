@@ -9,7 +9,11 @@ import sys
 import time
 
 from google.cloud import bigquery
-from cloudevents.http import CloudEvent
+
+import os
+from flask import Flask
+
+app = Flask(__name__)
 
 def get_film_dict(film_soup):
     film_dict = {}
@@ -52,6 +56,7 @@ def add_film_page_details(film_dict):
 
     return film_dict
 
+@app.route("/")
 def run(throttle=3, table_id='a24-portfolio.a24.films'):
 
     a24_films_url = 'https://a24films.com/films'
@@ -105,8 +110,5 @@ def run(throttle=3, table_id='a24-portfolio.a24.films'):
     
     return job.result()
 
-def subscribe(self, cloud_event: CloudEvent) -> str:
-    return run()
-
 if __name__ == "__main__":
-    run()
+    app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))

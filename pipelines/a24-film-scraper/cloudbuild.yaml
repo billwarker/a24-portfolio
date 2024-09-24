@@ -24,4 +24,4 @@ images:
 - 'gcr.io/$PROJECT_ID/a24-film-scraper:$COMMIT_SHA'
 
 options:
-  logging: NONE
+  logging: CLOUD_LOGGING_ONLY

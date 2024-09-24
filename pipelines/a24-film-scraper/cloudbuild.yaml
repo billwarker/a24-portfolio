@@ -5,7 +5,7 @@ steps:
   - 'build'
   - '-t'
   - 'gcr.io/$PROJECT_ID/a24-film-scraper:$COMMIT_SHA'
-  - './pipelines/a24-film-scraper''
+  - './pipelines/a24-film-scraper'
 # Push the container image to Container Registry
 - name: 'gcr.io/cloud-builders/docker'
   args: ['push', 'gcr.io/$PROJECT_ID/a24-film-scraper:$COMMIT_SHA']

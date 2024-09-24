@@ -1,23 +1,16 @@
 steps:
 # Build the container image
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'gcr.io/$PROJECT_ID/a24-film-scraper:$COMMIT_SHA', '.']
+  args: ['build', '-t', 'gcr.io/a24-portfolio/a24-film-scraper', '.']
 # Push the container image to Container Registry
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['push', 'gcr.io/$PROJECT_ID/a24-film-scraper:$COMMIT_SHA']
+  args: ['push', 'gcr.io/a24-portfolio/a24-film-scraper']
 # Deploy container image to Cloud Run
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
   entrypoint: gcloud
-  args:
-  - 'run'
-  - 'deploy'
-  - 'a24-film-scraper'
-  - '--image'
-  - 'gcr.io/$PROJECT_ID/a24-film-scraper:$COMMIT_SHA'
-  - '--region'
-  - 'us-east1'
+  args: ['run', 'deploy', 'a24-film-scraper', '--image', 'gcr.io/a24-portfolio/a24-film-scraper', '--region', 'SERVICE_REGION']
 images:
-- 'gcr.io/$PROJECT_ID/a24-film-scraper:$COMMIT_SHA'
+- gcr.io/a24-portfolio/a24-film-scraper
 
 options:
   logging: CLOUD_LOGGING_ONLY

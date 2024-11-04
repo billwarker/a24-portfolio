@@ -1,4 +1,4 @@
-# Scrapy settings for oscars project
+# Scrapy settings for academy_awards project
 #
 # For simplicity, this file contains only settings considered important or
 # commonly used. You can find more settings consulting the documentation:
@@ -7,39 +7,28 @@
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
-BOT_NAME = "oscars"
+BOT_NAME = "academy_awards"
 
-SPIDER_MODULES = ["oscars.spiders"]
-NEWSPIDER_MODULE = "oscars.spiders"
+SPIDER_MODULES = ["academy_awards.spiders"]
+NEWSPIDER_MODULE = "academy_awards.spiders"
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-USER_AGENT = "oscars-scraper (+http://www.yourdomain.com)"
+#USER_AGENT = "academy_awards (+http://www.yourdomain.com)"
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = True
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-#CONCURRENT_REQUESTS = 32
+CONCURRENT_REQUESTS = 32
 
 # Configure a delay for requests for the same website (default: 0)
 # See https://docs.scrapy.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
-#DOWNLOAD_DELAY = 3
+DOWNLOAD_DELAY = 3
 # The download delay setting will honor only one of:
-CONCURRENT_REQUESTS_PER_DOMAIN = 1
-
-# PlayWright Configurations
-DOWNLOAD_HANDLERS = {
-    "http": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
-    "https": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
-}
-
-PLAYWRIGHT_BROWSER_TYPE = "firefox"
-PLAYWRIGHT_LAUNCH_OPTIONS = {
-    "headless": True,
-    "timeout": 20 * 1000,  # 20 seconds
-}
+CONCURRENT_REQUESTS_PER_DOMAIN = 16
+CONCURRENT_REQUESTS_PER_IP = 16
 
 # Disable cookies (enabled by default)
 #COOKIES_ENABLED = False
@@ -56,13 +45,13 @@ PLAYWRIGHT_LAUNCH_OPTIONS = {
 # Enable or disable spider middlewares
 # See https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 #SPIDER_MIDDLEWARES = {
-#    "oscars.middlewares.OscarsSpiderMiddleware": 543,
+#    "academy_awards.middlewares.AcademyAwardsSpiderMiddleware": 543,
 #}
 
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #DOWNLOADER_MIDDLEWARES = {
-#    "oscars.middlewares.OscarsDownloaderMiddleware": 543,
+#    "academy_awards.middlewares.AcademyAwardsDownloaderMiddleware": 543,
 #}
 
 # Enable or disable extensions
@@ -73,9 +62,23 @@ PLAYWRIGHT_LAUNCH_OPTIONS = {
 
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-#ITEM_PIPELINES = {
-#    "oscars.pipelines.OscarsPipeline": 300,
-#}
+ITEM_PIPELINES = {
+   "academy_awards.pipelines.BigQueryPipeline": 300,
+}
+
+# BigQueryPipeline Settings
+
+BIGQUERY_SERVICE_ACCOUNT_FILE = '/Users/will/Projects/a24-portfolio/a24-portfolio-5f82bf5e6ef3.json'
+BIGQUERY_PROJECT_ID = 'a24-portfolio'
+BIGQUERY_DATASET_ID = 'oscars'
+BIGQUERY_TABLE_ID = 'academy_awards'
+
+GCS_BUCKET_NAME = 'academy-awards-scraper'
+PAYLOAD_FILE_NAME = 'data.ndjson'
+PAYLOAD_FILE_PATH = 'json_payloads'
+
+
+
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/autothrottle.html
